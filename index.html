@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HearthPlay Web</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <h1>HearthPlay Web</h1>
+    <section class="controls">
+      <input id="magnet" placeholder="magnet:?xt=urn:btih:..." />
+      <button id="playBtn">נגן</button>
+      <button id="stopBtn">עצור ונקה</button>
+    </section>
+
+    <section class="subs">
+      <h3>כתוביות ידניות</h3>
+      <div>
+        <label>קובץ:
+          <input type="file" id="subsFile" accept=".srt,.vtt" />
+        </label>
+        <input id="subsUrl" placeholder="קישור ישיר לכתוביות .vtt/.srt (דורש CORS)" />
+        <button id="loadSubsBtn">טען</button>
+      </div>
+      <h3>חיפוש כתוביות (Proxy API)</h3>
+      <div class="subs-search">
+        <label>שפה:
+          <select id="langSelect">
+            <option value="he" selected>HE</option>
+            <option value="en">EN</option>
+          </select>
+        </label>
+        <button id="searchSubsBtn">חפש כתוביות</button>
+      </div>
+      <div id="subsResults" class="subs-results"></div>
+    </section>
+
+    <section class="status">
+      <div>Peers: <span id="peers">0</span></div>
+      <div>מהירות: <span id="speed">0</span> KB/s</div>
+      <div>התקדמות: <span id="progress">0%</span></div>
+      <div class="note">שימו לב: חייבים מגנט עם WebRTC trackers (wss). האחסון זמני בדפדפן (IndexedDB).</div>
+    </section>
+
+    <video id="video" controls playsinline></video>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/webtorrent/webtorrent.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
