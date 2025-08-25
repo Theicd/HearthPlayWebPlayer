@@ -13,7 +13,7 @@ const langSelect = document.getElementById('langSelect')
 const searchSubsBtn = document.getElementById('searchSubsBtn')
 const subsResultsEl = document.getElementById('subsResults')
 
-const client = new WebTorrent()
+let client = null
 let currentTorrent = null
 let currentTitle = ''
 let jwt = ''
@@ -51,10 +51,12 @@ function normalizeMagnet(input){
 }))
 
 playBtn.onclick = () => {
+  ensureClient().then(()=>{
   let magnet = normalizeMagnet(magnetInput.value.trim())
   if (!magnet) { alert('הדבק מגנט'); return }
   if (currentTorrent) { stopAndClean() }
   // במידת הצורך הטרקרים נוספו בנרמול
+  if (!client) { alert('WebTorrent לא נטען. בדוק חוסמי תוכן/רשת.'); return }
   client.add(magnet, { announce: DEFAULT_TRACKERS }, (torrent) => {
     currentTorrent = torrent
     // עדכון כותרת בעת קבלת metadata
@@ -73,6 +75,7 @@ playBtn.onclick = () => {
       }
     }, 12000)
   })
+  }).catch(()=> alert('כשל בטעינת ספריית WebTorrent'))
 }
 
 stopBtn.onclick = stopAndClean
@@ -82,7 +85,7 @@ function stopAndClean(){
   currentTorrent = null
   video.removeAttribute('src'); video.load()
   // ניקוי cache בדפדפן (בגדול הדפדפן מנהל; זה מנקה חיבורים/זיכרון של הטורנט)
-  try { client.torrents.forEach(t => t.destroy()) } catch {}
+  try { client && client.torrents.forEach(t => t.destroy()) } catch {}
 }
 
 function pickBestVideoFile(files){
@@ -106,7 +109,39 @@ function bindStats(t){
 }
 
 // חיווי שגיאות גלובלי של הלקוח
-client.on('error', (e)=> console.warn('client error', e))
+// יוגדר אחרי אתחול הלקוח
+
+async function ensureClient(){
+  if (client) return client
+  await ensureWebTorrentLib()
+  if (!window.WebTorrent) throw new Error('missing WebTorrent')
+  client = new WebTorrent()
+  client.on('error', (e)=> console.warn('client error', e))
+  return client
+}
+
+function loadScript(src){
+  return new Promise((resolve,reject)=>{
+    const s = document.createElement('script')
+    s.src = src
+    s.async = true
+    s.onload = ()=> resolve()
+    s.onerror = ()=> reject(new Error('load failed '+src))
+    document.head.appendChild(s)
+  })
+}
+
+async function ensureWebTorrentLib(){
+  if (window.WebTorrent) return
+  const cdns = [
+    'https://unpkg.com/webtorrent@2.3.0/dist/webtorrent.min.js',
+    'https://cdn.jsdelivr.net/npm/webtorrent@2.3.0/dist/webtorrent.min.js'
+  ]
+  for (const url of cdns){
+    try { await loadScript(url); if (window.WebTorrent) return } catch{}
+  }
+  throw new Error('WebTorrent CDN blocked')
+}
 
 // כתוביות: טעינת קובץ .srt/.vtt מקומי או URL (דורש CORS)
 loadSubsBtn.onclick = async () => {
