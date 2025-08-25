@@ -29,10 +29,32 @@ const DEFAULT_TRACKERS = [
   'wss://tracker.webtorrent.dev',
 ]
 
+function normalizeMagnet(input){
+  if (!input || !/^magnet:\?/i.test(input)) return input
+  let m = input.trim()
+  // הסר כל tr מסוג UDP
+  m = m.replace(/&tr=udp[^&]*/gi, '')
+  // ודא טרקרים WSS ייחודיים
+  const hasWss = /&tr=wss:\/\//i.test(m)
+  const toAdd = []
+  DEFAULT_TRACKERS.forEach(tr=>{ if (!new RegExp('&tr='+tr.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(m)) toAdd.push(`&tr=${encodeURIComponent(tr)}`) })
+  if (!hasWss || toAdd.length) m += toAdd.join('')
+  return m
+}
+
+// נרמול אוטומטי כשמדביקים/יוצאים מהשדה
+;['change','blur','paste'].forEach(ev=> magnetInput.addEventListener(ev,()=>{
+  const v = magnetInput.value
+  if (!v) return
+  const norm = normalizeMagnet(v)
+  if (norm && norm!==v) magnetInput.value = norm
+}))
+
 playBtn.onclick = () => {
-  const magnet = magnetInput.value.trim()
+  let magnet = normalizeMagnet(magnetInput.value.trim())
   if (!magnet) { alert('הדבק מגנט'); return }
   if (currentTorrent) { stopAndClean() }
+  // במידת הצורך הטרקרים נוספו בנרמול
   client.add(magnet, { announce: DEFAULT_TRACKERS }, (torrent) => {
     currentTorrent = torrent
     // עדכון כותרת בעת קבלת metadata

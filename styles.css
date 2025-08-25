@@ -1,6 +1,39 @@
-body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:0;padding:20px;background:#111;color:#eee}
-main{max-width:900px;margin:auto}
-input,button{padding:8px;margin:4px}
-.controls,.subs,.status{margin:10px 0}
-video{width:100%;max-height:70vh;background:#000}
-.note{font-size:.9em;color:#aaa}
+:root{--bg:#0e0f12;--panel:#15171c;--muted:#9aa0a6;--text:#e8eaed;--accent:#1f6feb;--accent2:#2ea043;--danger:#d33}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{font-family:Segoe UI,system-ui,Arial,sans-serif;margin:0;background:radial-gradient(1200px 600px at 80% -10%,#1b1e26 0%,#0e0f12 50%,#0e0f12 100%);color:var(--text)}
+main{max-width:980px;margin:0 auto;padding:28px}
+h1{margin:0 0 18px;font-weight:700;letter-spacing:.5px;text-align:center}
+
+/* כרטיס מרכזי */
+.controls,.subs,.status{background:var(--panel);border:1px solid #23262d;border-radius:12px;padding:14px 16px;margin:14px 0;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.controls{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+
+/* שדות וכפתורים */
+input,select,button{font:inherit}
+input,select{width:100%;padding:10px 12px;border:1px solid #2a2f38;border-radius:10px;background:#0f1116;color:var(--text);outline:none}
+input::placeholder{color:#6e767d}
+button{padding:10px 14px;border:1px solid #2a2f38;border-radius:10px;background:#0f1320;color:var(--text);cursor:pointer;transition:.15s transform,.15s background}
+button:hover{background:#16213a}
+#playBtn{background:linear-gradient(120deg,var(--accent),#4c93ff)}
+#stopBtn{background:linear-gradient(120deg,#6a1f1f,var(--danger))}
+#loadSubsBtn{background:linear-gradient(120deg,var(--accent2),#3fd46d)}
+#searchSubsBtn{background:linear-gradient(120deg,var(--accent),#4c93ff)}
+label{margin-inline-end:8px;color:var(--muted)}
+
+/* קבוצת כתוביות */
+.subs h3{margin:6px 0 10px;color:#cbd5e1}
+.subs-search{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.subs-results{margin-top:10px;display:grid;gap:8px}
+.subs-results .result{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;border:1px solid #2a2f38;border-radius:10px;background:#101319}
+.subs-results .meta .name{font-weight:600}
+.subs-results .muted{color:var(--muted);font-size:.9em}
+.subs-results .btn{padding:8px 12px;border-radius:10px;background:#1a2336;border:1px solid #2a2f38}
+
+/* סטטוס ונגן */
+.status{display:flex;gap:16px;align-items:center;flex-wrap:wrap;color:var(--muted)}
+video{width:100%;max-height:66vh;background:#000;border-radius:12px;border:1px solid #23262d;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.note{font-size:.9em;color:var(--muted)}
+
+/* רספונסיבי */
+@media (max-width:720px){.controls{grid-template-columns:1fr 1fr;}.controls #magnet{grid-column:1/-1}}
